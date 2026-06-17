@@ -77,5 +77,103 @@
   #set($discard = $columns.add('_actions'))
 #end
 #livetable('qa' $columns $columnsProperties $options)
+#*
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      {'id': 'deprecated', 'class': 'QA.TestClass', 'filterable': true, 'sortable': true,
+        'filter': {
+          'id': 'list',
+          'options': [
+            {'value': 'yes', 'label': 'Yes'},
+            {'value': 'no', 'label': 'No'}
+          ]
+        }
+      },
+      {'id': 'doc.title', 'displayer': 'link', 'size': 10, 'filterable': true, 'sortable': true},
+      {'id': 'wikiType', 'type': 'list', 'class': 'QA.TestClass', 'filterable': true, 'sortable': true,
+        'filter': {
+          'id': 'list',
+          'options': [
+            {'value': 'mainWiki', 'label': 'Main Wiki'},
+            {'value': 'subwiki', 'label': 'Subwiki'},
+            {'value': 'both', 'label': 'Both'}
+          ]
+        }
+      },
+      {'id': 'userType', 'type': 'list', 'class': 'QA.TestClass', 'filterable': true, 'sortable': true,
+        'filter': {
+          'id': 'list',
+          'options': [
+            {'value': 'admin', 'label': 'Admin'},
+            {'value': 'user', 'label': 'User'},
+            {'value': 'both', 'label': 'Both'}
+          ]
+        }
+      },
+      {'id': 'product', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'browsers', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'databases', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'servletContainers', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'javas', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'distributions', 'displayer': 'html', 'filterable': false, 'sortable': false, "editable": false},
+      {'id': 'automated', 'type': 'list', 'filterable': true, 'sortable': true,
+        'filter': {
+          'id': 'list',
+          'match': 'prefix',
+          'options': [
+            {'value': 'automated', 'label': 'Automated'},
+            {'value': 'notAutomatable', 'label': 'Not Automatable'},
+            {'value': 'needsTest', 'label': 'Needs Automated Test'}
+          ]
+        }
+      },
+      {
+        'id': '_actions',
+        'displayer': {
+          'id': 'actions',
+          'actions': ['runTest', 'delete']
+        }
+      },
+      {
+        "id": "tags",
+        "visible": false
+      }
+    ],
+    "actions": [
+      {
+        "id": "runTest",
+        "name": "Run Test",
+        "description": "Run Test",
+        "icon": {"iconSetName": "Font Awesome", "cssClass": "fa fa-play"}
+      }
+    ]
+  },
+  "query": {
+    "sort": [
+      {
+        "property": "doc.title",
+        "descending": false
+      }
+    ]
+  }
+})
+
+#set ($sourceParameters = {
+  'resultPage':'QA.LiveTableResults',
+  "translationPrefix" : "qaapp.WebHome.LiveTable."
+})
+
+## Ideally, you should implement this after XWIKI-19037: Support tag clouds on Live Data
+
+{{liveData
+  id='qa-livedata'
+  source='liveTable'
+  sourceParameters="$services.rendering.escape($escapetool.url($sourceParameters), 'xwiki/2.1')"
+  properties='$services.rendering.escape($stringtool.join($columns, ','), 'xwiki/2.1')'
+  sort='doc.title:asc'
+  limit=15
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
+*#
 {{/velocity}}</content>
 </xwikidoc>
